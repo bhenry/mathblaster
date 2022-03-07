@@ -9,13 +9,26 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <style>
-html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif;}
+html,body,h1,h2,h3,h4,h5,h6 {
+  font-family: "Roboto", sans-serif;
+  color: #333;
+}
 .w3-sidebar {
   z-index: 3;
   width: 250px;
   top: 43px;
   bottom: 0;
   height: inherit;
+  padding-left:16px;
+}
+.w3-huge {
+  font-size: 25px;
+}
+.prob-top {
+
+}
+.prob-bottom {
+  border-bottom: 1px solid #333;
 }
 </style>
 </head>
@@ -40,11 +53,37 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif;}
   <a href="javascript:void(0)" onclick="w3_close()" class="w3-right w3-xlarge w3-padding-large w3-hover-black w3-hide-large" title="Close Menu">
     <i class="fa fa-remove"></i>
   </a>
-  <h4 class="w3-bar-item"><b>Menu</b></h4>
+  <h4 class="w3-bar-item"><b>Settings</b></h4>
+  <label for="number_range">How many digits?</label><br>
+  <select id="number_range">
+    <option value="1">1</option>
+    <option selected="selected" value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+  </select><br>
+  <label for="operators">What to practice?</label><br>
+  <input type="checkbox" id="add" checked="checked" name="operator[]" value="add">
+  <label for="add">+</label>
+  <input type="checkbox" id="subtract" checked="checked" name="operator[]" value="subtract">
+  <label for="subtract">-</label>
+  <input type="checkbox" id="multiply" checked="checked" name="operator[]" value="multiply">
+  <label for="multiply">x</label>
+  <input type="checkbox" id="divide" checked="checked" name="operator[]" value="divide">
+  <label for="divide">&#247;</label>
+  <br>
+  <button onclick="start_practice()">Start Practice</button>
+  <!-- <select id="operators" onchange="change_operators()" multiple>
+    <option value="+">+</option>
+    <option value="-">-</option>
+    <option value="x">x</option>
+    <option value="&#247;">&#247;</option>
+  </select> -->
+
+  <!-- <a class="w3-bar-item w3-button w3-hover-black" href="#">Link</a>
   <a class="w3-bar-item w3-button w3-hover-black" href="#">Link</a>
   <a class="w3-bar-item w3-button w3-hover-black" href="#">Link</a>
-  <a class="w3-bar-item w3-button w3-hover-black" href="#">Link</a>
-  <a class="w3-bar-item w3-button w3-hover-black" href="#">Link</a>
+  <a class="w3-bar-item w3-button w3-hover-black" href="#">Link</a> -->
 </nav>
 
 <!-- Overlay effect when opening sidebar on small screens -->
@@ -55,9 +94,8 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif;}
 
   <div class="w3-row w3-padding-64">
     <div class="w3-twothird w3-container">
-      <h1 class="w3-text-teal">Heading</h1>
-      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Lorem ipsum
-        dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+      <h1 class="w3-text-teal">Playground</h1>
+      <div id="playground"></div>
     </div>
   </div>
 
@@ -103,6 +141,7 @@ html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif;}
 </div>
 
 <script>
+  var app = {};
 // Get the Sidebar
 var mySidebar = document.getElementById("mySidebar");
 
@@ -124,6 +163,122 @@ function w3_open() {
 function w3_close() {
   mySidebar.style.display = "none";
   overlayBg.style.display = "none";
+}
+function getRandomInt(max) {
+  return Math.floor(Math.random() * max);
+}
+
+// Set the number of digits to display
+function get_number_range() {
+  var number_range = document.getElementById("number_range").value;
+  return 10**number_range;
+}
+
+function get_operators() {
+  var operators = document.getElementsByName("operator[]");
+  var selected_operators = [];
+  for (var i = 0; i < operators.length; i++) {
+    if (operators[i].checked) {
+      selected_operators.push(operators[i].value);
+    }
+  }
+  return selected_operators;
+}
+
+function start_practice() {
+  make_problem();
+}
+
+function find_answer(problem){
+  var answer = 0;
+  var operator = problem.operator;
+  var number_range = problem.number_range;
+  var num1 = problem.num1;
+  var num2 = problem.num2;
+  if (operator == "+") {
+    answer = num1 + num2;
+  } else if (operator == "-") {
+    answer = num1 - num2;
+  } else if (operator == "x") {
+    answer = num1 * num2;
+  } else if (operator == "&#247;") {
+    answer = num1 / num2;
+  }
+  return answer;
+}
+
+function make_problem(){
+  var operators = get_operators();
+  var number_range = get_number_range();
+  if (operators.length == 0) {
+    alert("Please select at least one operator");
+    return;
+  }
+
+  var problem_data = {};
+  var operator_map = {
+    "add": "+",
+    "subtract": "-",
+    "multiply": "x",
+    "divide": "&#247;"
+  }
+  problem_data.operator = operator_map[operators[getRandomInt(operators.length)]];
+  problem_data.num1 = getRandomInt(number_range);
+  problem_data.num2 = getRandomInt(number_range);
+  if (problem_data.operator == "&#247;") {
+    if (problem_data.num1 % problem_data.num2 != 0) {
+      make_problem();
+      return
+    }
+  }
+  var correct_answer = find_answer(problem_data);
+  var playground = document.getElementById("playground");
+  playground.innerHTML = "";
+  var problem = document.createElement("div");
+  var num1Div = document.createElement("div");
+  var num2Div = document.createElement("div");
+  num1Div.className = "w3-huge prob-top";
+  num2Div.className = "w3-huge prob-bottom";
+  num1Div.innerHTML = problem_data.num1;
+  num2Div.innerHTML = problem_data.num2;
+  operator = document.createElement("div");
+  operator.innerHTML = problem_data.operator;
+  problem.appendChild(num1Div);
+  problem.appendChild(operator);
+  problem.appendChild(num2Div);
+  problem.appendChild(make_answer_div(correct_answer));
+  playground.appendChild(problem);
+}
+
+function make_answer_div(correct_answer){
+  var answer_div = document.createElement("div");
+  answer_div.className = "w3-center w3-padding-32";
+  var answer_input = document.createElement("input");
+  answer_input.type = "text";
+  answer_input.className = "w3-input w3-border w3-round-large";
+  answer_input.id = "answer";
+  answer_input.placeholder = "Answer";
+  answer_div.appendChild(answer_input);
+  answer_div.appendChild(make_answer_button(correct_answer));
+  return answer_div;
+}
+
+function make_answer_button(correct_answer){
+  var answer_button = document.createElement("button");
+  answer_button.className = "w3-button w3-black w3-round-large";
+  answer_button.innerHTML = "Check Answer";
+  answer_button.onclick = function(){
+    var answer = document.getElementById("answer").value;
+    if (parseInt(answer) == correct_answer) {
+      alert("Correct!");
+      make_problem();
+    } else {
+      alert("Incorrect!");
+    }
+    console.log(answer);
+    console.log(correct_answer);
+  }
+  return answer_button;
 }
 </script>
 
