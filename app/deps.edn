@@ -1,0 +1,7 @@
+{
+    :deps {
+        com.bhauman/figwheel-main {:mvn/version "0.2.16"}
+        hiccups/hiccups {:mvn/version "0.3.0"}
+    }
+    :paths ["src" "target" "resources"]
+}

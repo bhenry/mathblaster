@@ -67,9 +67,9 @@ html,body,h1,h2,h3,h4,h5,h6 {
   <label for="add">+</label>
   <input type="checkbox" id="subtract" checked="checked" name="operator[]" value="subtract">
   <label for="subtract">-</label>
-  <input type="checkbox" id="multiply" checked="checked" name="operator[]" value="multiply">
+  <input type="checkbox" id="multiply" name="operator[]" value="multiply">
   <label for="multiply">x</label>
-  <input type="checkbox" id="divide" checked="checked" name="operator[]" value="divide">
+  <input type="checkbox" id="divide" name="operator[]" value="divide">
   <label for="divide">&#247;</label>
   <br>
   <button onclick="start_practice()">Start Practice</button>
@@ -251,34 +251,40 @@ function make_problem(){
 }
 
 function make_answer_div(correct_answer){
-  var answer_div = document.createElement("div");
-  answer_div.className = "w3-center w3-padding-32";
+  var answerDiv = document.createElement("div");
+  var answer_form = document.createElement("form");
+  answer_form.onsubmit = function(){
+    check_answer(correct_answer);
+    return false;
+  };
+  answer_form.className = "w3-center w3-padding-32";
   var answer_input = document.createElement("input");
   answer_input.type = "text";
   answer_input.className = "w3-input w3-border w3-round-large";
   answer_input.id = "answer";
   answer_input.placeholder = "Answer";
-  answer_div.appendChild(answer_input);
-  answer_div.appendChild(make_answer_button(correct_answer));
-  return answer_div;
+  answer_form.appendChild(answer_input);
+  answer_form.appendChild(make_answer_button(correct_answer));
+  answerDiv.appendChild(answer_form);
+  return answerDiv;
 }
 
 function make_answer_button(correct_answer){
   var answer_button = document.createElement("button");
   answer_button.className = "w3-button w3-black w3-round-large";
   answer_button.innerHTML = "Check Answer";
-  answer_button.onclick = function(){
-    var answer = document.getElementById("answer").value;
-    if (parseInt(answer) == correct_answer) {
-      alert("Correct!");
-      make_problem();
-    } else {
-      alert("Incorrect!");
-    }
-    console.log(answer);
-    console.log(correct_answer);
-  }
+  answer_button.onclick = check_answer(correct_answer);
   return answer_button;
+}
+
+function check_answer(correct_answer){
+  var answer = document.getElementById("answer").value;
+  if (parseInt(answer) == correct_answer) {
+    alert("Correct!");
+    make_problem();
+  } else {
+    alert("Incorrect!");
+  }
 }
 </script>
 
